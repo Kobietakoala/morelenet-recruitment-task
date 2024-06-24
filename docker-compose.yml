@@ -1,0 +1,45 @@
+services:
+    php:
+      build:
+        context: .
+        dockerfile: dockerfiles/php/dockerfile
+      volumes:
+        - ./app:/var/www
+        - ./dockerfiles/php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+        - ./dockerfiles/php/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+      container_name: php
+      networks:
+        - morelenet
+
+    server:
+      build:
+        context: .
+        dockerfile: dockerfiles/nginx/dockerfile
+      ports:
+        - 8080:80
+      volumes:
+        - ./app:/var/www
+      depends_on: 
+        - php
+      container_name: server
+      networks:
+        - morelenet 
+
+    # symfony:
+    #   build:
+    #     context: .
+    #     dockerfile: dockerfiles/php/dockerfile
+    #   volumes:
+    #     - ./app:/var/www/html
+    #   entrypoint: ["php", "/var/www/html/symfony server:start"]
+    #   depends_on:
+    #     - php
+    #   networks:
+    #     - morelenet
+
+networks:
+  morelenet:
+    driver: bridge
+
+volumes:
+    mysqldata: {}

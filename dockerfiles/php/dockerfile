@@ -1,0 +1,53 @@
+# FROM php:8.3.8-cli
+
+# # COPY app .
+
+# RUN apt-get update \
+#     &&  apt-get install -y --no-install-recommends \
+#         apt-utils libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev unzip libpq-dev wget \
+#         apt-transport-https lsb-release ca-certificates
+
+
+# RUN curl -sS https://getcomposer.org/installer | php -- \
+#     &&  mv composer.phar /usr/local/bin/composer
+
+# COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+# RUN docker-php-ext-configure \
+#             intl && \
+#     docker-php-ext-install \
+#     opcache intl zip calendar dom mbstring gd xsl
+
+# RUN pecl install apcu xdebug-3.3.2 && \
+#     docker-php-ext-enable apcu && \
+#     docker-php-ext-enable xdebug
+
+# # RUN groupadd -g 10001 moreleapp && \
+# #     useradd moreleapp -g moreleapp -s /bin/sh 
+
+# # RUN chown -hR moreleapp /var/www/html
+
+# # USER moreleapp
+
+# # RUN ["composer", "create-project symfony/skeletion"]
+# # php composer.phar create-project symfony/skeleton
+# WORKDIR /var/www
+
+# CMD composer install; php
+
+# EXPOSE 9000
+
+
+FROM php:fpm-alpine
+
+RUN apk --update --no-cache add git
+
+RUN apk add bash
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+
+CMD composer install ; php-fpm 
+
+EXPOSE 9000
